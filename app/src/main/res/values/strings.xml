@@ -1,5 +1,9 @@
 <resources>
-    <string name="app_name">Audio Player</string>
+    <string name="app_name">Music Player</string>
     <string name="play">play</string>
     <string name="pause">pause</string>
+    <string name="my_song">My song</string>
+    <string name="song">song</string>
+    <string name="skip_next">skip next</string>
+    <string name="skip_previous">skip previous</string>
 </resources>
