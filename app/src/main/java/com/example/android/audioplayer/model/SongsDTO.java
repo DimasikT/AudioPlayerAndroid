@@ -1,4 +1,5 @@
-package com.example.android.audioplayer;
+package com.example.android.audioplayer.model;
+
 
 import java.io.Serializable;
 import java.util.List;

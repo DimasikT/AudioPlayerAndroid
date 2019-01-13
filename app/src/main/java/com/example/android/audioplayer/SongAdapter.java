@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.audioplayer.model.Song;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -45,7 +47,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
         private TextView nameTextView;
 
-        public void bind(String songName){
+        private void bind(String songName){
             nameTextView.setText(songName);
         }
 

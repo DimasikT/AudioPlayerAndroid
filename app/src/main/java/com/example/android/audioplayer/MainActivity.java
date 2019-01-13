@@ -20,6 +20,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.audioplayer.model.Song;
+import com.example.android.audioplayer.model.SongsDTO;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,6 +91,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 stopPlay();
+                nowPlayingIndex++;
+                if (nowPlayingIndex >= songs.size()){
+                    nowPlayingIndex = 0;
+                    tuneMediaPlayer(songs.get(nowPlayingIndex));
+                } else {
+                    tuneMediaPlayer(songs.get(nowPlayingIndex));
+                }
+                reTuneSeekBar();
+                mediaPlayer.start();
+                play.setImageResource(R.drawable.ic_pause);
             }
         });
     }
@@ -247,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
                     // permission denied
                     songs = Collections.emptyList();
                 }
-                return;
         }
     }
 
@@ -266,7 +278,8 @@ public class MainActivity extends AppCompatActivity {
                         reTuneSeekBar();
                         if(isPlaying){
                             mediaPlayer.start();
-                            play.setImageResource(R.drawable.ic_pause); }
+                            play.setImageResource(R.drawable.ic_pause);
+                        }
                     }
                 }
             }

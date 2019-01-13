@@ -9,6 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.android.audioplayer.model.SongsDTO;
+
 
 public class SongListActivity extends AppCompatActivity {
 
