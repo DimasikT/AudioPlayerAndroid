@@ -1,29 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
+    <ImageView
+        android:id="@+id/song_bg_image_view"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="8dp"
+        app:srcCompat="@drawable/circle"
+        tools:ignore="ContentDescription"/>
+
+    <ImageView
+        android:id="@+id/song_image_view"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        app:srcCompat="@drawable/ic_audiotrack"
+        tools:ignore="ContentDescription"/>
+
     <TextView
         android:id="@+id/name_song_textView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
-        android:textColor="@color/colorAccent"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:padding="5dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="40dp"
         android:clickable="true"
-        android:onClick="playSong" />
+        android:onClick="playSong"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:layout_toEndOf="@id/song_bg_image_view"
+        android:focusable="true"
+        android:layout_centerVertical="true"
+        android:singleLine="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"/>
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="5dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/name_song_textView" />
+        android:layout_height="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:layout_below="@id/name_song_textView" />
 
-</android.support.constraint.ConstraintLayout>
+
+</RelativeLayout>

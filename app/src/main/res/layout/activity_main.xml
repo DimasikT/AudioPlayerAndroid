@@ -47,14 +47,16 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="0"
-            android:background="@color/colorPrimaryDark"
             android:paddingStart="8dp"
             android:paddingEnd="8dp"
             android:text="@string/my_song"
-            android:textColor="@color/colorAccent"
+            android:textColor="@android:color/white"
             android:textSize="20sp"
             android:layout_marginTop="20dp"
-            android:layout_marginBottom="30dp"/>
+            android:layout_marginBottom="30dp"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"/>
 
         <SeekBar
             android:id="@+id/progressSeekBar"

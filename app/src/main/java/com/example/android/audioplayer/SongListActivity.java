@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.TextView;
 
@@ -23,16 +24,16 @@ public class SongListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actitvity_songlist);
 
-        setTitle(R.string.song_list_title);
-
         initRecyclerView();
         Intent songsList = getIntent();
+
         loadSongList(songsList);
     }
 
     private void loadSongList(Intent intent) {
 
         SongsDTO songsDTO = (SongsDTO) intent.getSerializableExtra("songsList");
+
 
         songAdapter.setItems(songsDTO.getSongs());
     }

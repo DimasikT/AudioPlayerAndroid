@@ -1,10 +1,12 @@
 package com.example.android.audioplayer;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.android.audioplayer.model.Song;
@@ -22,6 +24,16 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         notifyDataSetChanged();
     }
 
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
+
     @NonNull
     @Override
     public SongViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
@@ -32,7 +44,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull SongViewHolder songViewHolder, int i) {
-        songViewHolder.bind(songList.get(i).getName());
+            songViewHolder.bind(songList.get(i));
     }
 
     @Override
@@ -45,18 +57,26 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         // View-компонентов, которым вы хотите задавать какие-либо свойства
         // в процессе работы пользователя со списком
 
-        private TextView nameTextView;
+        private TextView nameSongTextView;
+        private ImageView songImageView;
 
-        private void bind(String songName){
-            nameTextView.setText(songName);
+
+        private void bind(Song song){
+            nameSongTextView.setText(song.getName());
+            if(song.isSelected()){
+                songImageView.setImageResource(R.drawable.ic_play_now);
+                nameSongTextView.setTextColor(0xFF478dff);
+                nameSongTextView.setSelected(true);
+            }
+
         }
 
         // Мы также создали конструктор, который принимает на вход View-компонент строкИ
         // и ищет все дочерние компоненты
         public SongViewHolder(View itemView) {
             super(itemView);
-
-            nameTextView = itemView.findViewById(R.id.name_song_textView);
+            nameSongTextView = itemView.findViewById(R.id.name_song_textView);
+            songImageView = itemView.findViewById(R.id.song_image_view);
         }
     }
 }

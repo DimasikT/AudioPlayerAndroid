@@ -26,7 +26,9 @@ import com.example.android.audioplayer.model.SongsDTO;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -68,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         tuneProgressSeekBar(mediaPlayer);
+//        initShortName();
     }
 
 
@@ -79,18 +82,17 @@ public class MainActivity extends AppCompatActivity {
         songNameTextView = findViewById(R.id.nowPlaying_textView);
 
         timer = new Timer();
+        songNameTextView.setSelected(true);
     }
 
     private void tuneMediaPlayer(Song song) {
-        if(songs == null){
-            return;
-        }
         mediaPlayer = MediaPlayer.create(this, Uri.fromFile(song.getFile()));
         songNameTextView.setText(song.getName());
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 stopPlay();
+                switchSelected();
                 nowPlayingIndex++;
                 if (nowPlayingIndex >= songs.size()){
                     nowPlayingIndex = 0;
@@ -98,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     tuneMediaPlayer(songs.get(nowPlayingIndex));
                 }
+                switchSelected();
                 reTuneSeekBar();
                 mediaPlayer.start();
                 play.setImageResource(R.drawable.ic_pause);
@@ -142,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
     public void skipPrevious(View view) {
         isPlaying = mediaPlayer.isPlaying();
         stopPlay();
+        switchSelected();
         nowPlayingIndex--;
         if (nowPlayingIndex < 0){
             nowPlayingIndex = songs.size() - 1;
@@ -149,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             tuneMediaPlayer(songs.get(nowPlayingIndex));
         }
+        switchSelected();
         reTuneSeekBar();
         if(isPlaying){ playPause(view); }
     }
@@ -167,6 +172,8 @@ public class MainActivity extends AppCompatActivity {
     public void skipNext(View view) {
         isPlaying = mediaPlayer.isPlaying();
         stopPlay();
+        switchSelected();
+
         nowPlayingIndex++;
         if (nowPlayingIndex >= songs.size()){
             nowPlayingIndex = 0;
@@ -174,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             tuneMediaPlayer(songs.get(nowPlayingIndex));
         }
+        switchSelected();
         reTuneSeekBar();
         if(isPlaying){ playPause(view); }
 
@@ -200,6 +208,7 @@ public class MainActivity extends AppCompatActivity {
         Intent songsListIntent = new Intent(MainActivity.this, SongListActivity.class);
         SongsDTO songsList = new SongsDTO(songs);
         songsListIntent.putExtra("songsList", songsList);
+        songsListIntent.putExtra("nowPlayingIndex", nowPlayingIndex);
         startActivityForResult(songsListIntent, CHOOSE_SONG);
     }
 
@@ -270,11 +279,14 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 isPlaying = mediaPlayer.isPlaying();
                 stopPlay();
-                String songName = data.getStringExtra("songName");
+                selectedNone();
+                String shortNameSong = data.getStringExtra("songName");
+
                 for(int i = 0; i < songs.size(); i++){
-                    if(songs.get(i).getName().equals(songName)){
+                    if(songs.get(i).getName().equals(shortNameSong)){
                         tuneMediaPlayer(songs.get(i));
                         nowPlayingIndex = i;
+                        switchSelected();
                         reTuneSeekBar();
                         if(isPlaying){
                             mediaPlayer.start();
@@ -287,7 +299,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void playFirst(){
-        tuneMediaPlayer(songs.get(0));
+        Song song = songs.get(0);
+        song.setSelected(true);
+        tuneMediaPlayer(song);
         nowPlayingIndex = 0;
+    }
+
+
+    private void switchSelected() {
+        Song song = songs.get(nowPlayingIndex);
+        if (song.isSelected()) {
+            song.setSelected(false);
+        } else {
+            song.setSelected(true);
+        }
+    }
+
+    private void selectedNone(){
+        for(Song s : songs){
+            s.setSelected(false);
+        }
     }
 }

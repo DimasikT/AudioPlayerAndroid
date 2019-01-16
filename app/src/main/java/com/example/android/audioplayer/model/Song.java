@@ -10,6 +10,8 @@ public class Song implements Comparable<Song>, Serializable {
     private String name;
     private File file;
 
+    private boolean isSelected;
+
     public String getPath() {
         return path;
     }
@@ -32,6 +34,14 @@ public class Song implements Comparable<Song>, Serializable {
 
     public void setFile(File file) {
         this.file = file;
+    }
+
+    public boolean isSelected() {
+        return isSelected;
+    }
+
+    public void setSelected(boolean selected) {
+        isSelected = selected;
     }
 
     @Override
