@@ -24,11 +24,10 @@ import com.example.android.audioplayer.model.Song;
 import com.example.android.audioplayer.model.SongsDTO;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -52,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean isPlaying;
 
+    private MyOnCompletionListener completionListener;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,18 +60,17 @@ public class MainActivity extends AppCompatActivity {
 
         initFields();
 
-        if(checkPermission()){
+        if (checkPermission()) {
             songs = getAllAudioFromDevice(this);
         } else {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     REQUEST_CODE_PERMISSION_READ_CONTACTS);
         }
-        if(!songs.isEmpty()){
+        if (!songs.isEmpty()) {
             playFirst();
         }
 
         tuneProgressSeekBar(mediaPlayer);
-//        initShortName();
     }
 
 
@@ -83,29 +83,24 @@ public class MainActivity extends AppCompatActivity {
 
         timer = new Timer();
         songNameTextView.setSelected(true);
+
+        completionListener = this.new MyOnCompletionListener();
     }
 
     private void tuneMediaPlayer(Song song) {
-        mediaPlayer = MediaPlayer.create(this, Uri.fromFile(song.getFile()));
-        songNameTextView.setText(song.getName());
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                stopPlay();
-                switchSelected();
-                nowPlayingIndex++;
-                if (nowPlayingIndex >= songs.size()){
-                    nowPlayingIndex = 0;
-                    tuneMediaPlayer(songs.get(nowPlayingIndex));
-                } else {
-                    tuneMediaPlayer(songs.get(nowPlayingIndex));
-                }
-                switchSelected();
-                reTuneSeekBar();
-                mediaPlayer.start();
-                play.setImageResource(R.drawable.ic_pause);
+        if (mediaPlayer != null) {
+            mediaPlayer.reset();
+            try {
+                mediaPlayer.setDataSource(this, Uri.fromFile(song.getFile()));
+                mediaPlayer.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        });
+        } else {
+            mediaPlayer = MediaPlayer.create(this, Uri.fromFile(song.getFile()));
+            mediaPlayer.setOnCompletionListener(completionListener);
+        }
+        songNameTextView.setText(song.getName());
     }
 
     private void tuneProgressSeekBar(final MediaPlayer mediaPlayer) {
@@ -119,11 +114,10 @@ public class MainActivity extends AppCompatActivity {
         }, 0, 1000);
 
 
-
         progressSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if(fromUser){
+                if (fromUser) {
                     mediaPlayer.seekTo(progress);
                 }
             }
@@ -144,10 +138,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void skipPrevious(View view) {
         isPlaying = mediaPlayer.isPlaying();
-        stopPlay();
+        mediaPlayer.stop();
         switchSelected();
         nowPlayingIndex--;
-        if (nowPlayingIndex < 0){
+        if (nowPlayingIndex < 0) {
             nowPlayingIndex = songs.size() - 1;
             tuneMediaPlayer(songs.get(nowPlayingIndex));
         } else {
@@ -155,12 +149,14 @@ public class MainActivity extends AppCompatActivity {
         }
         switchSelected();
         reTuneSeekBar();
-        if(isPlaying){ playPause(view); }
+        if (isPlaying) {
+            playPause(view);
+        }
     }
 
     public void playPause(View view) {
         animateButton(view);
-        if(mediaPlayer.isPlaying()){
+        if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             play.setImageResource(R.drawable.ic_play);
         } else {
@@ -171,11 +167,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void skipNext(View view) {
         isPlaying = mediaPlayer.isPlaying();
-        stopPlay();
+        mediaPlayer.stop();
         switchSelected();
 
         nowPlayingIndex++;
-        if (nowPlayingIndex >= songs.size()){
+        if (nowPlayingIndex >= songs.size()) {
             nowPlayingIndex = 0;
             tuneMediaPlayer(songs.get(nowPlayingIndex));
         } else {
@@ -183,25 +179,22 @@ public class MainActivity extends AppCompatActivity {
         }
         switchSelected();
         reTuneSeekBar();
-        if(isPlaying){ playPause(view); }
+        if (isPlaying) {
+            playPause(view);
+        }
 
     }
 
     public void stop(View view) {
         animateButton(view);
-        stopPlay();
-    }
-
-    private void stopPlay(){
         mediaPlayer.stop();
-        play.setImageResource(R.drawable.ic_play);
         try {
             mediaPlayer.prepare();
             mediaPlayer.seekTo(0);
+        } catch (IOException e) {
+            Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
         }
-        catch (Throwable t) {
-            Toast.makeText(this, t.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+        play.setImageResource(R.drawable.ic_play);
     }
 
     public void showList(View view) {
@@ -212,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(songsListIntent, CHOOSE_SONG);
     }
 
-    private void reTuneSeekBar(){
+    private void reTuneSeekBar() {
         timer.cancel();
         tuneProgressSeekBar(mediaPlayer);
     }
@@ -250,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         return tempSongList;
     }
 
-    public boolean checkPermission(){
+    public boolean checkPermission() {
         int permissionStatus = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
 
         return permissionStatus == PackageManager.PERMISSION_GRANTED;
@@ -278,17 +271,17 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == CHOOSE_SONG) {
             if (resultCode == RESULT_OK) {
                 isPlaying = mediaPlayer.isPlaying();
-                stopPlay();
+                mediaPlayer.stop();
                 selectedNone();
-                String shortNameSong = data.getStringExtra("songName");
+                String songName = data.getStringExtra("songName");
 
-                for(int i = 0; i < songs.size(); i++){
-                    if(songs.get(i).getName().equals(shortNameSong)){
+                for (int i = 0; i < songs.size(); i++) {
+                    if (songs.get(i).getName().equals(songName)) {
                         tuneMediaPlayer(songs.get(i));
                         nowPlayingIndex = i;
                         switchSelected();
                         reTuneSeekBar();
-                        if(isPlaying){
+                        if (isPlaying) {
                             mediaPlayer.start();
                             play.setImageResource(R.drawable.ic_pause);
                         }
@@ -298,13 +291,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void playFirst(){
+    private void playFirst() {
         Song song = songs.get(0);
         song.setSelected(true);
         tuneMediaPlayer(song);
         nowPlayingIndex = 0;
     }
-
 
     private void switchSelected() {
         Song song = songs.get(nowPlayingIndex);
@@ -315,9 +307,29 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void selectedNone(){
-        for(Song s : songs){
+    private void selectedNone() {
+        for (Song s : songs) {
             s.setSelected(false);
+        }
+    }
+
+    private class MyOnCompletionListener implements MediaPlayer.OnCompletionListener {
+
+        @Override
+        public void onCompletion(MediaPlayer mp) {
+            mediaPlayer.stop();
+            switchSelected();
+            nowPlayingIndex++;
+            if (nowPlayingIndex >= songs.size()) {
+                nowPlayingIndex = 0;
+                tuneMediaPlayer(songs.get(nowPlayingIndex));
+            } else {
+                tuneMediaPlayer(songs.get(nowPlayingIndex));
+            }
+            switchSelected();
+            reTuneSeekBar();
+            mediaPlayer.start();
+            play.setImageResource(R.drawable.ic_pause);
         }
     }
 }
