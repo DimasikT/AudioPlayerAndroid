@@ -34,12 +34,12 @@ public class SongListActivity extends AppCompatActivity {
 
         SongsDTO songsDTO = (SongsDTO) intent.getSerializableExtra("songsList");
 
-
         songAdapter.setItems(songsDTO.getSongs());
     }
 
     private void initRecyclerView() {
         songRecyclerView = findViewById(R.id.song_recyclerView);
+        songRecyclerView.setHasFixedSize(true);
         songRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         songAdapter = new SongAdapter();
         songRecyclerView.setAdapter(songAdapter);

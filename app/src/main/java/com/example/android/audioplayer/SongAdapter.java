@@ -1,6 +1,5 @@
 package com.example.android.audioplayer;
 
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -52,21 +51,24 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         return songList.size();
     }
 
-    class SongViewHolder extends RecyclerView.ViewHolder {
+    public static class SongViewHolder extends RecyclerView.ViewHolder {
         // Ваш ViewHolder должен содержать переменные для всех
         // View-компонентов, которым вы хотите задавать какие-либо свойства
         // в процессе работы пользователя со списком
 
         private TextView nameSongTextView;
         private ImageView songImageView;
+        private TextView durationTextView;
 
 
         private void bind(Song song){
             nameSongTextView.setText(song.getName());
+            durationTextView.setText(parseDuration(song.getDuration()));
             if(song.isSelected()){
                 songImageView.setImageResource(R.drawable.ic_play_now);
                 nameSongTextView.setTextColor(0xFF478dff);
                 nameSongTextView.setSelected(true);
+                durationTextView.setTextColor(0xFF478dff);
             }
 
         }
@@ -77,6 +79,21 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             super(itemView);
             nameSongTextView = itemView.findViewById(R.id.name_song_textView);
             songImageView = itemView.findViewById(R.id.song_image_view);
+            durationTextView = itemView.findViewById(R.id.duration_song_textView);
+        }
+
+        private String parseDuration(int ms) {
+            if(ms == -1) {
+                return "?";
+            } else {
+                int minutes = ms/1000/60;
+                int seconds = ms/1000%60;
+                String min = minutes > 9 ? minutes + "" : "0" + minutes;
+                String sec = seconds > 9 ? seconds + "" : "0" + seconds;
+
+                return min + ":" + sec;
+            }
+
         }
     }
 }

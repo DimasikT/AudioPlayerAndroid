@@ -41,28 +41,48 @@
 
         </RelativeLayout>
 
+            <TextView
+                android:id="@+id/nowPlaying_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:text="@string/my_song"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:marqueeRepeatLimit="marquee_forever"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
         <TextView
-            android:id="@+id/nowPlaying_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_weight="0"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"
-            android:text="@string/my_song"
+            android:id="@+id/duration_start_textView"
+            android:layout_width="30dp"
+            android:layout_height="20dp"
             android:textColor="@android:color/white"
-            android:textSize="20sp"
-            android:layout_marginTop="20dp"
-            android:layout_marginBottom="30dp"
-            android:singleLine="true"
-            android:ellipsize="marquee"
-            android:marqueeRepeatLimit="marquee_forever"/>
+            android:textSize="12sp" />
 
         <SeekBar
             android:id="@+id/progressSeekBar"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3" />
+
+        <TextView
+            android:id="@+id/duration_end_textView"
+            android:layout_width="30dp"
+            android:layout_height="20dp"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
+    </LinearLayout>
 
         <RelativeLayout
             android:layout_width="match_parent"

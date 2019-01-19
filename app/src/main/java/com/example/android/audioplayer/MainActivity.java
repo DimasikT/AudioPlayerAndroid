@@ -47,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView songNameTextView;
 
+    private TextView durationStartTextView;
+    private TextView durationEndTextView;
+
     private Timer timer;
 
     private boolean isPlaying;
@@ -81,6 +84,9 @@ public class MainActivity extends AppCompatActivity {
 
         songNameTextView = findViewById(R.id.nowPlaying_textView);
 
+        durationStartTextView = findViewById(R.id.duration_start_textView);
+        durationEndTextView = findViewById(R.id.duration_end_textView);
+
         timer = new Timer();
         songNameTextView.setSelected(true);
 
@@ -101,6 +107,8 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer.setOnCompletionListener(completionListener);
         }
         songNameTextView.setText(song.getName());
+        durationStartTextView.setText("00:00");
+        durationEndTextView.setText(parseDuration(song.getDuration()));
     }
 
     private void tuneProgressSeekBar(final MediaPlayer mediaPlayer) {
@@ -110,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void run() {
                 progressSeekBar.setProgress(mediaPlayer.getCurrentPosition());
+                durationStartTextView.setText(parseDuration(mediaPlayer.getCurrentPosition()));
             }
         }, 0, 1000);
 
@@ -119,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
                     mediaPlayer.seekTo(progress);
+                    durationStartTextView.setText(parseDuration(progress));
                 }
             }
 
@@ -220,7 +230,11 @@ public class MainActivity extends AppCompatActivity {
         final List<Song> tempSongList = new ArrayList<>();
 
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String[] projection = {MediaStore.Audio.AudioColumns.DATA, MediaStore.Audio.AudioColumns.TITLE};
+        String[] projection = {
+                MediaStore.Audio.AudioColumns.DATA,
+                MediaStore.Audio.AudioColumns.TITLE,
+                MediaStore.Audio.AudioColumns.DURATION
+        };
 
 //        Cursor c = context.getContentResolver().query(uri, projection, MediaStore.Audio.Media.DATA + " like ? ", new String[]{"Music"}, null);
         Cursor c = context.getContentResolver().query(uri, projection, null, null, null);
@@ -230,9 +244,11 @@ public class MainActivity extends AppCompatActivity {
                 Song song = new Song();
                 String path = c.getString(0);
                 String name = c.getString(1);
+                int duration = Integer.parseInt(c.getString(2));
 
                 song.setName(name);
                 song.setPath(path);
+                song.setDuration(duration);
                 song.setFile(new File(path));
 
                 tempSongList.add(song);
@@ -311,6 +327,20 @@ public class MainActivity extends AppCompatActivity {
         for (Song s : songs) {
             s.setSelected(false);
         }
+    }
+
+    private String parseDuration(int ms) {
+        if(ms == -1) {
+            return "?";
+        } else {
+            int minutes = ms/1000/60;
+            int seconds = ms/1000%60;
+            String min = minutes > 9 ? minutes + "" : "0" + minutes;
+            String sec = seconds > 9 ? seconds + "" : "0" + seconds;
+
+            return min + ":" + sec;
+        }
+
     }
 
     private class MyOnCompletionListener implements MediaPlayer.OnCompletionListener {

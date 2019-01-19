@@ -9,6 +9,15 @@ public class Song implements Comparable<Song>, Serializable {
     private String path;
     private String name;
     private File file;
+    private int duration;
+
+    public int getDuration() {
+        return duration;
+    }
+
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
 
     private boolean isSelected;
 
