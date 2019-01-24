@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import es.claucookie.miniequalizerlibrary.EqualizerView;
+
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
 
     private List<Song> songList = new ArrayList<>();
@@ -59,16 +61,17 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         private TextView nameSongTextView;
         private ImageView songImageView;
         private TextView durationTextView;
+        private EqualizerView equalizer;
 
 
         private void bind(Song song){
+
             nameSongTextView.setText(song.getName());
             durationTextView.setText(parseDuration(song.getDuration()));
             if(song.isSelected()){
-                songImageView.setImageResource(R.drawable.ic_play_now);
-                nameSongTextView.setTextColor(0xFF478dff);
-                nameSongTextView.setSelected(true);
-                durationTextView.setTextColor(0xFF478dff);
+                markSongAsPlaying();
+            } else {
+                markSongAsNotPlaying();
             }
 
         }
@@ -80,6 +83,8 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             nameSongTextView = itemView.findViewById(R.id.name_song_textView);
             songImageView = itemView.findViewById(R.id.song_image_view);
             durationTextView = itemView.findViewById(R.id.duration_song_textView);
+            equalizer = itemView.findViewById(R.id.song_list_equalizer_view);
+
         }
 
         private String parseDuration(int ms) {
@@ -94,6 +99,24 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
                 return min + ":" + sec;
             }
 
+        }
+
+        private void markSongAsPlaying(){
+            songImageView.setImageResource(R.drawable.ic_play_now);
+            nameSongTextView.setTextColor(0xFF478dff);
+            nameSongTextView.setSelected(true);
+            durationTextView.setVisibility(View.INVISIBLE);
+            equalizer.setVisibility(View.VISIBLE);
+            equalizer.animateBars();
+        }
+
+        private void markSongAsNotPlaying(){
+            songImageView.setImageResource(R.drawable.ic_audiotrack);
+            nameSongTextView.setTextColor(0xffffffff);
+            nameSongTextView.setSelected(false);
+            durationTextView.setVisibility(View.VISIBLE);
+            equalizer.setVisibility(View.INVISIBLE);
+            equalizer.stopBars();
         }
     }
 }

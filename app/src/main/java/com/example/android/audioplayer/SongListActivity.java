@@ -47,7 +47,6 @@ public class SongListActivity extends AppCompatActivity implements SongSubscribe
     }
 
     private void loadSongList(List<Song> songs) {
-
         songAdapter.setItems(songs);
     }
 
@@ -75,6 +74,6 @@ public class SongListActivity extends AppCompatActivity implements SongSubscribe
 
     @Override
     public void updateState() {
-        recreate();
+        songAdapter.notifyDataSetChanged();
     }
 }
