@@ -139,7 +139,7 @@ public class SongService {
 
     }
 
-    public Song getNowPlayng(){
+    public Song getNowPlaying(){
         return songs.get(nowPlayingIndex);
     }
 
@@ -191,6 +191,7 @@ public class SongService {
     }
 
     public void close(){
+        mediaPlayer.setOnCompletionListener(null);
         mediaPlayer.stop();
         mediaPlayer.reset();
     }

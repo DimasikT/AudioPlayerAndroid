@@ -7,4 +7,5 @@
     <string name="skip_next">skip next</string>
     <string name="skip_previous">skip previous</string>
     <string name="song_list_title">Your songs</string>
+    <string name="no_tracks">no tracks</string>
 </resources>

@@ -6,7 +6,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.android.audioplayer.model.Song;
@@ -21,16 +26,24 @@ public class SongListActivity extends AppCompatActivity {
 
     private SongService songs;
 
+    private TextView noTracksTextView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actitvity_songlist);
 
-        songs = SongService.getInstance();
-        initRecyclerView();
+        noTracksTextView = findViewById(R.id.no_tracks_text_view);
 
-        loadSongList(songs.getSongs());
+        songs = SongService.getInstance();
+        if(songs.getSongs().isEmpty()) {
+            noTracksTextView.setVisibility(View.VISIBLE);
+        } else {
+            initRecyclerView();
+            loadSongList(songs.getSongs());
+        }
+
     }
 
     private void loadSongList(List<Song> songs) {

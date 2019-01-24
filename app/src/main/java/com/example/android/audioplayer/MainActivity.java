@@ -16,7 +16,9 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
 import com.example.android.audioplayer.model.Song;
+import com.gauravk.audiovisualizer.visualizer.BlastVisualizer;
 
 import java.io.IOException;
 import java.util.Timer;
@@ -24,7 +26,7 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final int REQUEST_CODE_PERMISSION_READ_CONTACTS = 1;
+    private static final int REQUEST_CODE_PERMISSION = 1;
     static final private int CHOOSE_SONG = 0;
 
     private MediaPlayer mediaPlayer;
@@ -42,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
     private Timer timer;
 
+    private BlastVisualizer blastV;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,20 +54,34 @@ public class MainActivity extends AppCompatActivity {
 
         initFields();
 
-        if (checkPermission()) {
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_DENIED ||
+                ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
+            requestPermission();
+        }
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED) {
             songs.findSongs();
         } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                    REQUEST_CODE_PERMISSION_READ_CONTACTS);
+            return;
         }
+
+
         songs.start();
         mediaPlayer = songs.getMediaPlayer();
-        tuneProgressSeekBar(mediaPlayer, songs.getNowPlayng());
+
+        tuneProgressSeekBar(mediaPlayer, songs.getNowPlaying());
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            blastV = findViewById(R.id.blast);
+            int audioSessionId = mediaPlayer.getAudioSessionId();
+            if (audioSessionId != -1) blastV.setAudioSessionId(audioSessionId);
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (blastV != null)
+            blastV.release();
         songs.close();
     }
 
@@ -121,12 +139,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void skipPrevious(View view) {
         animateButton(view);
+        if(mediaPlayer == null) {
+            return;
+        }
         songs.skipPrevious();
         reTuneSeekBar();
     }
 
     public void playPause(View view) {
         animateButton(view);
+        if(mediaPlayer == null) {
+            return;
+        }
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             play.setImageResource(R.drawable.ic_play);
@@ -138,12 +162,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void skipNext(View view) {
         animateButton(view);
+        if(mediaPlayer == null) {
+            return;
+        }
         songs.skipNext();
         reTuneSeekBar();
     }
 
     public void stop(View view) {
         animateButton(view);
+        if(mediaPlayer == null) {
+            return;
+        }
         mediaPlayer.stop();
         try {
             mediaPlayer.prepare();
@@ -161,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void reTuneSeekBar() {
         timer.cancel();
-        tuneProgressSeekBar(mediaPlayer, songs.getNowPlayng());
+        tuneProgressSeekBar(mediaPlayer, songs.getNowPlaying());
     }
 
     private void animateButton(View view) {
@@ -170,25 +200,27 @@ public class MainActivity extends AppCompatActivity {
         view.animate().scaleX(1f).scaleY(1f).setDuration(200);
     }
 
-
-    public boolean checkPermission() {
-        int permissionStatus = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-
-        return permissionStatus == PackageManager.PERMISSION_GRANTED;
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_PERMISSION_READ_CONTACTS:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // permission granted
-                    songs.findSongs();
-                }
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        switch (requestCode) {
+//            case REQUEST_CODE_PERMISSION_READ_STORAGE:
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    // permission granted
+//                    songs.findSongs();
+//                }
+//            case REQUEST_CODE_PERMISSION_RECORD_AUDIO:
+//                if (grantResults.length > 0
+//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    // permission granted
+//                    int audioSessionId = mediaPlayer.getAudioSessionId();
+//                    if (audioSessionId != -1)
+//                        blastV.setAudioSessionId(audioSessionId);
+//                } else {
+//                    blastV.setVisibility(View.INVISIBLE);
+//                }
+//        }
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -220,7 +252,13 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onCompletion(MediaPlayer mp) {
             songs.skipNext();
+            mediaPlayer.start();
             reTuneSeekBar();
         }
+    }
+
+    private void requestPermission(){
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO},
+                REQUEST_CODE_PERMISSION);
     }
 }
