@@ -114,7 +114,6 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    mediaPlayer.seekTo(progress);
                     durationStartTextView.setText(parseDuration(progress));
                 }
             }
@@ -126,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                mediaPlayer.seekTo(seekBar.getProgress());
             }
         });
     }
@@ -221,15 +220,9 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == CHOOSE_SONG) {
-            if (resultCode == RESULT_OK) {
-                String songName = data.getStringExtra("songName");
-                songs.playForName(songName);
-                reTuneSeekBar();
-            }
-        }
+    protected void onResume() {
+        super.onResume();
+        reTuneSeekBar();
     }
 
     private String parseDuration(int ms) {

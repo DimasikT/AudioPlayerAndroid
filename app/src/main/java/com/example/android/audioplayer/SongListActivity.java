@@ -1,17 +1,11 @@
 package com.example.android.audioplayer;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.TypedValue;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.example.android.audioplayer.model.Song;
@@ -59,11 +53,9 @@ public class SongListActivity extends AppCompatActivity implements SongSubscribe
     }
 
     public void playSong(View view) {
-        TextView tv = (TextView)view;
-        Intent songIntent = new Intent();
-        songIntent.putExtra("songName", tv.getText());
-        setResult(RESULT_OK, songIntent);
-        finish();
+        TextView songName = (TextView)view;
+        songs.playForName(songName.getText().toString());
+        songAdapter.notifyDataSetChanged();
     }
 
     @Override
