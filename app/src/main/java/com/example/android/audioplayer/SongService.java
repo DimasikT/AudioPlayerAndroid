@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class SongService {
+public class SongService implements SongPublisher{
 
     private static SongService instance;
 
@@ -27,9 +27,9 @@ public class SongService {
 
     private boolean isPlaying;
 
-    private MainActivity.MyOnCompletionListener completionListener;
-
     private Context context;
+
+    private List<SongSubscriber> subscribers = new ArrayList<>();
 
 
 
@@ -49,10 +49,6 @@ public class SongService {
 
     public void setContext(Context context) {
         this.context = context;
-    }
-
-    public void setCompletionListener(MainActivity.MyOnCompletionListener completionListener) {
-        this.completionListener = completionListener;
     }
 
     public MediaPlayer getMediaPlayer() {
@@ -134,7 +130,16 @@ public class SongService {
             }
         } else {
             mediaPlayer = MediaPlayer.create(context, Uri.fromFile(song.getFile()));
-            mediaPlayer.setOnCompletionListener(completionListener);
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    if(!subscribers.isEmpty()){
+                        skipNext();
+                        notifySubscribers();
+                        mediaPlayer.start();
+                    }
+                }
+            });
         }
 
     }
@@ -191,8 +196,24 @@ public class SongService {
     }
 
     public void close(){
-        mediaPlayer.setOnCompletionListener(null);
         mediaPlayer.stop();
         mediaPlayer.reset();
+    }
+
+    @Override
+    public void addSongSubscriber(SongSubscriber subscriber) {
+        subscribers.add(subscriber);
+    }
+
+    @Override
+    public void removeSongSubscriber(SongSubscriber subscriber) {
+        subscribers.remove(subscriber);
+    }
+
+    @Override
+    public void notifySubscribers() {
+        for(SongSubscriber subscriber : subscribers){
+            subscriber.updateState();
+        }
     }
 }

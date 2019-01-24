@@ -19,7 +19,7 @@ import com.example.android.audioplayer.model.Song;
 import java.util.List;
 
 
-public class SongListActivity extends AppCompatActivity {
+public class SongListActivity extends AppCompatActivity implements SongSubscriber {
 
     private RecyclerView songRecyclerView;
     private SongAdapter songAdapter;
@@ -43,7 +43,7 @@ public class SongListActivity extends AppCompatActivity {
             initRecyclerView();
             loadSongList(songs.getSongs());
         }
-
+        songs.addSongSubscriber(this);
     }
 
     private void loadSongList(List<Song> songs) {
@@ -65,5 +65,16 @@ public class SongListActivity extends AppCompatActivity {
         songIntent.putExtra("songName", tv.getText());
         setResult(RESULT_OK, songIntent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        songs.removeSongSubscriber(this);
+    }
+
+    @Override
+    public void updateState() {
+        recreate();
     }
 }

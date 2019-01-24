@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SongSubscriber {
 
     private static final int REQUEST_CODE_PERMISSION = 1;
     static final private int CHOOSE_SONG = 0;
@@ -57,24 +57,16 @@ public class MainActivity extends AppCompatActivity {
         if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_DENIED ||
                 ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_DENIED) {
             requestPermission();
-        }
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE ) == PackageManager.PERMISSION_GRANTED) {
-            songs.findSongs();
         } else {
-            return;
-        }
-
-
-        songs.start();
-        mediaPlayer = songs.getMediaPlayer();
-
-        tuneProgressSeekBar(mediaPlayer, songs.getNowPlaying());
-
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+            songs.findSongs();
+            songs.start();
+            mediaPlayer = songs.getMediaPlayer();
+            tuneProgressSeekBar(mediaPlayer, songs.getNowPlaying());
             blastV = findViewById(R.id.blast);
             int audioSessionId = mediaPlayer.getAudioSessionId();
             if (audioSessionId != -1) blastV.setAudioSessionId(audioSessionId);
         }
+        songs.addSongSubscriber(this);
     }
 
     @Override
@@ -82,13 +74,15 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (blastV != null)
             blastV.release();
-        songs.close();
+        songs.removeSongSubscriber(this);
+        if(mediaPlayer != null){
+            songs.close();
+        }
     }
 
     private void initFields() {
         songs = SongService.getInstance();
         songs.setContext(getApplicationContext());
-        songs.setCompletionListener(this.new MyOnCompletionListener());
         play = findViewById(R.id.play_imageView);
         progressSeekBar = findViewById(R.id.progressSeekBar);
         songNameTextView = findViewById(R.id.nowPlaying_textView);
@@ -200,27 +194,31 @@ public class MainActivity extends AppCompatActivity {
         view.animate().scaleX(1f).scaleY(1f).setDuration(200);
     }
 
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        switch (requestCode) {
-//            case REQUEST_CODE_PERMISSION_READ_STORAGE:
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    // permission granted
-//                    songs.findSongs();
-//                }
-//            case REQUEST_CODE_PERMISSION_RECORD_AUDIO:
-//                if (grantResults.length > 0
-//                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    // permission granted
-//                    int audioSessionId = mediaPlayer.getAudioSessionId();
-//                    if (audioSessionId != -1)
-//                        blastV.setAudioSessionId(audioSessionId);
-//                } else {
-//                    blastV.setVisibility(View.INVISIBLE);
-//                }
-//        }
-//    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_CODE_PERMISSION:
+                if (grantResults.length > 0){
+                    if(grantResults[0] == PackageManager.PERMISSION_GRANTED){
+                        songs.findSongs();
+                        songs.start();
+                        mediaPlayer = songs.getMediaPlayer();
+                        tuneProgressSeekBar(mediaPlayer, songs.getNowPlaying());
+                    } else {
+                        progressSeekBar.setEnabled(false);
+                        durationStartTextView.setText("00:00");
+                        durationEndTextView.setText("00:00");
+                        return;
+                    }
+
+                    if (grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                        blastV = findViewById(R.id.blast);
+                        int audioSessionId = mediaPlayer.getAudioSessionId();
+                        if (audioSessionId != -1) blastV.setAudioSessionId(audioSessionId);
+                    }
+                }
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -233,6 +231,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     private String parseDuration(int ms) {
         if(ms == -1) {
             return "?";
@@ -247,14 +246,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    class MyOnCompletionListener implements MediaPlayer.OnCompletionListener {
-
-        @Override
-        public void onCompletion(MediaPlayer mp) {
-            songs.skipNext();
-            mediaPlayer.start();
-            reTuneSeekBar();
-        }
+    @Override
+    public void updateState() {
+        reTuneSeekBar();
     }
 
     private void requestPermission(){
