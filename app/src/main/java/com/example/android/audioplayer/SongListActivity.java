@@ -17,10 +17,7 @@ public class SongListActivity extends AppCompatActivity implements SongSubscribe
 
     private RecyclerView songRecyclerView;
     private SongAdapter songAdapter;
-
     private SongService songs;
-
-    private TextView noTracksTextView;
 
 
     @Override
@@ -28,7 +25,7 @@ public class SongListActivity extends AppCompatActivity implements SongSubscribe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.actitvity_songlist);
 
-        noTracksTextView = findViewById(R.id.no_tracks_text_view);
+        TextView noTracksTextView = findViewById(R.id.no_tracks_text_view);
 
         songs = SongService.getInstance();
         if(songs.getSongs().isEmpty()) {
@@ -36,6 +33,7 @@ public class SongListActivity extends AppCompatActivity implements SongSubscribe
         } else {
             initRecyclerView();
             loadSongList(songs.getSongs());
+            songRecyclerView.scrollToPosition(songs.getNowPlayingIndex());
         }
         songs.addSongSubscriber(this);
     }

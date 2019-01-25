@@ -51,6 +51,14 @@ public class SongService implements SongPublisher{
         this.context = context;
     }
 
+    public int getNowPlayingIndex() {
+        return nowPlayingIndex;
+    }
+
+    public void setNowPlayingIndex(int nowPlayingIndex) {
+        this.nowPlayingIndex = nowPlayingIndex;
+    }
+
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
     }
@@ -94,6 +102,7 @@ public class SongService implements SongPublisher{
                 MediaStore.Audio.AudioColumns.DATA,
                 MediaStore.Audio.AudioColumns.TITLE,
                 MediaStore.Audio.AudioColumns.DURATION
+
         };
 
 //        Cursor c = context.getContentResolver().query(uri, projection, MediaStore.Audio.Media.DATA + " like ? ", new String[]{"Music"}, null);
