@@ -23,11 +23,11 @@
 
         <ImageView
             android:id="@+id/song_image_view"
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="2dp"
-            app:srcCompat="@drawable/ic_audiotrack"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="10dp"
+            app:srcCompat="@drawable/ic_pause"
             tools:ignore="ContentDescription" />
 
     </RelativeLayout>

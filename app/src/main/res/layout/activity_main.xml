@@ -47,7 +47,7 @@
                 android:layout_height="70dp"
                 android:layout_centerInParent="true"
                 android:contentDescription="@string/song"
-                app:srcCompat="@drawable/ic_audiotrack" />
+                app:srcCompat="@drawable/ic_note" />
 
         </RelativeLayout>
 
