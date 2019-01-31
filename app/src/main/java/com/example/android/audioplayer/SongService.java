@@ -55,10 +55,6 @@ public class SongService implements SongPublisher{
         return nowPlayingIndex;
     }
 
-    public void setNowPlayingIndex(int nowPlayingIndex) {
-        this.nowPlayingIndex = nowPlayingIndex;
-    }
-
     public MediaPlayer getMediaPlayer() {
         return mediaPlayer;
     }
@@ -172,6 +168,7 @@ public class SongService implements SongPublisher{
         if (isPlaying) {
             mediaPlayer.start();
         }
+        notifySubscribers();
     }
 
     public void skipPrevious(){
@@ -187,6 +184,7 @@ public class SongService implements SongPublisher{
         if(isPlaying){
             mediaPlayer.start();
         }
+        notifySubscribers();
     }
 
     public void skipNext(){
@@ -201,6 +199,20 @@ public class SongService implements SongPublisher{
         switchSelected();
         if(isPlaying){
             mediaPlayer.start();
+        }
+        notifySubscribers();
+    }
+
+    public boolean playPause() {
+
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            notifySubscribers();
+            return false;
+        } else {
+            mediaPlayer.start();
+            notifySubscribers();
+            return true;
         }
     }
 

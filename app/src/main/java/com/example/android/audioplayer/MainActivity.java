@@ -7,7 +7,11 @@ import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -27,7 +31,6 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity implements SongSubscriber {
 
     private static final int REQUEST_CODE_PERMISSION = 1;
-    static final private int CHOOSE_SONG = 0;
 
     private MediaPlayer mediaPlayer;
 
@@ -37,14 +40,10 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
 
     private SongService songs;
 
-    private TextView songNameTextView;
-
     private TextView durationStartTextView;
     private TextView durationEndTextView;
 
     private Timer timer;
-
-    private BlastVisualizer blastV;
 
 
     @Override
@@ -62,22 +61,19 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
             songs.start();
             mediaPlayer = songs.getMediaPlayer();
             tuneProgressSeekBar(mediaPlayer, songs.getNowPlaying());
-            blastV = findViewById(R.id.blast);
-            int audioSessionId = mediaPlayer.getAudioSessionId();
-            if (audioSessionId != -1) blastV.setAudioSessionId(audioSessionId);
         }
+        final ViewPager vpPager = findViewById(R.id.view_pager);
+        vpPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
         songs.addSongSubscriber(this);
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
-        if (blastV != null)
-            blastV.release();
         songs.removeSongSubscriber(this);
         if(mediaPlayer != null){
             songs.close();
         }
+        super.onDestroy();
     }
 
     private void initFields() {
@@ -85,17 +81,14 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
         songs.setContext(getApplicationContext());
         play = findViewById(R.id.play_imageView);
         progressSeekBar = findViewById(R.id.progressSeekBar);
-        songNameTextView = findViewById(R.id.nowPlaying_textView);
         durationStartTextView = findViewById(R.id.duration_start_textView);
         durationEndTextView = findViewById(R.id.duration_end_textView);
 
         timer = new Timer();
-        songNameTextView.setSelected(true);
     }
 
 
     private void tuneProgressSeekBar(final MediaPlayer mediaPlayer, Song song) {
-        songNameTextView.setText(song.getName());
         durationStartTextView.setText("00:00");
         durationEndTextView.setText(parseDuration(song.getDuration()));
 
@@ -141,16 +134,13 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
 
     public void playPause(View view) {
         animateButton(view);
-        if(mediaPlayer == null) {
-            return;
-        }
-        if (mediaPlayer.isPlaying()) {
-            mediaPlayer.pause();
-            play.setImageResource(R.drawable.ic_play);
-        } else {
-            mediaPlayer.start();
+
+        if (songs.playPause()) {
             play.setImageResource(R.drawable.ic_pause);
+        } else {
+            play.setImageResource(R.drawable.ic_play);
         }
+
     }
 
     public void skipNext(View view) {
@@ -160,6 +150,12 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
         }
         songs.skipNext();
         reTuneSeekBar();
+    }
+
+
+    public void playSongFromList(View view) {
+        TextView songName = (TextView)view;
+        songs.playForName(songName.getText().toString());
     }
 
     public void stop(View view) {
@@ -175,11 +171,6 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
             Toast.makeText(getApplicationContext(), e.toString(), Toast.LENGTH_SHORT).show();
         }
         play.setImageResource(R.drawable.ic_play);
-    }
-
-    public void showList(View view) {
-        Intent songsListIntent = new Intent(MainActivity.this, SongListActivity.class);
-        startActivityForResult(songsListIntent, CHOOSE_SONG);
     }
 
     private void reTuneSeekBar() {
@@ -207,13 +198,7 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
                         progressSeekBar.setEnabled(false);
                         durationStartTextView.setText("00:00");
                         durationEndTextView.setText("00:00");
-                        return;
-                    }
 
-                    if (grantResults[1] == PackageManager.PERMISSION_GRANTED){
-                        blastV = findViewById(R.id.blast);
-                        int audioSessionId = mediaPlayer.getAudioSessionId();
-                        if (audioSessionId != -1) blastV.setAudioSessionId(audioSessionId);
                     }
                 }
         }
@@ -247,5 +232,44 @@ public class MainActivity extends AppCompatActivity implements SongSubscriber {
     private void requestPermission(){
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.RECORD_AUDIO},
                 REQUEST_CODE_PERMISSION);
+    }
+
+    public static class MyPagerAdapter extends FragmentPagerAdapter {
+        private  int NUM_ITEMS = 2;
+
+        MyPagerAdapter(FragmentManager fragmentManager) {
+            super(fragmentManager);
+        }
+
+        // Returns total number of pages
+        @Override
+        public int getCount() {
+            return NUM_ITEMS;
+        }
+
+        @Override
+        public int getItemPosition(@NonNull Object object) {
+            return POSITION_NONE;
+        }
+
+        // Returns the fragment to display for that page
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    return VisualizationFragment.newInstance();
+                case 1:
+                    return SongListFragment.newInstance();
+                default:
+                    return null;
+            }
+        }
+
+        // Returns the page title for the top indicator
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return "Page " + position;
+        }
+
     }
 }
