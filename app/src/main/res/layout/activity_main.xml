@@ -17,60 +17,24 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <RelativeLayout
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
-            android:layout_marginTop="25dp">
+            android:layout_weight="5">
 
-            <com.gauravk.audiovisualizer.visualizer.BlastVisualizer
-                xmlns:custom="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/blast"
+            <android.support.v4.view.ViewPager
+                android:id="@+id/view_pager"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                custom:avDensity="0.9"
-                custom:avType="outline"
-                custom:avColor="@color/mediaButton"
-                custom:avSpeed="normal"/>
+                android:layout_height="match_parent"/>
 
-            <ImageView
-                android:id="@+id/soundtrackBackground_imageView"
-                android:layout_width="135dp"
-                android:layout_height="135dp"
-                android:layout_centerInParent="true"
-                app:srcCompat="@drawable/circle"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/soundtrack_imageView"
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:layout_centerInParent="true"
-                android:contentDescription="@string/song"
-                app:srcCompat="@drawable/ic_note" />
-
-        </RelativeLayout>
-
-            <TextView
-                android:id="@+id/nowPlaying_textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="1"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:text="@string/my_song"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                android:singleLine="true"
-                android:ellipsize="marquee"
-                android:marqueeRepeatLimit="marquee_forever"/>
+        </FrameLayout>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_marginTop="15dp">
 
         <TextView
             android:id="@+id/duration_start_textView"
@@ -97,29 +61,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="2"
+            android:layout_weight="1"
             android:layout_marginBottom="25dp">
-
-            <ImageView
-                android:id="@+id/stopBackground_imageView"
-                android:layout_width="51dp"
-                android:layout_height="51dp"
-                android:layout_toStartOf="@id/previousBackground_imageView"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="10dp"
-                app:srcCompat="@drawable/circle"
-                android:onClick="stop"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/stop_imageView"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_toStartOf="@id/previousBackground_imageView"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="13dp"
-                android:contentDescription="@string/skip_previous"
-                app:srcCompat="@drawable/ic_stop" />
 
             <ImageView
                 android:id="@+id/previousBackground_imageView"
@@ -127,7 +70,7 @@
                 android:layout_height="51dp"
                 android:layout_toStartOf="@id/playBackground_imageView"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="10dp"
+                android:layout_marginEnd="15dp"
                 app:srcCompat="@drawable/circle"
                 android:onClick="skipPrevious"
                 tools:ignore="ContentDescription" />
@@ -138,7 +81,7 @@
                 android:layout_height="45dp"
                 android:layout_toStartOf="@id/playBackground_imageView"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="13dp"
+                android:layout_marginEnd="18dp"
                 android:contentDescription="@string/skip_previous"
                 app:srcCompat="@drawable/ic_skip_previous" />
 
@@ -167,7 +110,7 @@
                 android:layout_height="51dp"
                 android:layout_toEndOf="@id/playBackground_imageView"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="10dp"
+                android:layout_marginStart="15dp"
                 app:srcCompat="@drawable/circle"
                 tools:ignore="ContentDescription"
                 android:onClick="skipNext" />
@@ -178,30 +121,9 @@
                 android:layout_height="45dp"
                 android:layout_toEndOf="@id/playBackground_imageView"
                 android:layout_centerVertical="true"
-                android:layout_marginStart="13dp"
+                android:layout_marginStart="18dp"
                 android:contentDescription="@string/skip_next"
                 app:srcCompat="@drawable/ic_skip_next" />
-
-            <ImageView
-                android:id="@+id/listBackground_imageView"
-                android:layout_width="51dp"
-                android:layout_height="51dp"
-                android:layout_toEndOf="@id/nextBackground_imageView"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="10dp"
-                app:srcCompat="@drawable/circle"
-                tools:ignore="ContentDescription"
-                android:onClick="showList"/>
-
-            <ImageView
-                android:id="@+id/list_imageView"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_toEndOf="@id/nextBackground_imageView"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="13dp"
-                android:contentDescription="@string/skip_next"
-                app:srcCompat="@drawable/ic_list" />
 
         </RelativeLayout>
 

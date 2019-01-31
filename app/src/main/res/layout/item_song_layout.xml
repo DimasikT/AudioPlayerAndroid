@@ -40,7 +40,7 @@
         android:ellipsize="marquee"
         android:focusable="true"
         android:marqueeRepeatLimit="marquee_forever"
-        android:onClick="playSong"
+        android:onClick="playSongFromList"
         android:singleLine="true"
         android:textColor="@android:color/white"
         android:textSize="18sp"
