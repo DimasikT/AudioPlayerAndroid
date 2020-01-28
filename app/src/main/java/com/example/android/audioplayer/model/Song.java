@@ -10,6 +10,7 @@ public class Song implements Comparable<Song>, Serializable {
     private String name;
     private File file;
     private int duration;
+    private boolean isSelected;
 
     public int getDuration() {
         return duration;
@@ -18,8 +19,6 @@ public class Song implements Comparable<Song>, Serializable {
     public void setDuration(int duration) {
         this.duration = duration;
     }
-
-    private boolean isSelected;
 
     public String getPath() {
         return path;
@@ -51,6 +50,13 @@ public class Song implements Comparable<Song>, Serializable {
 
     public void setSelected(boolean selected) {
         isSelected = selected;
+    }
+
+    public static Song getBlank(){
+        Song song = new Song();
+        song.setName("blank");
+        song.setDuration(0);
+        return song;
     }
 
     @Override

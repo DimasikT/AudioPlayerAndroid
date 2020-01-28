@@ -154,7 +154,7 @@ public class SongService implements SongPublisher{
     }
 
     public Song getNowPlaying(){
-        return songs.get(nowPlayingIndex);
+        return songs.isEmpty() ? Song.getBlank() : songs.get(nowPlayingIndex);
     }
 
     public void playForName(String name) {
